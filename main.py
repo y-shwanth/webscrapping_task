@@ -18,7 +18,8 @@ def getsoup(url, headers):
 
 def getnextpage(common_url, soup):
     return common_url + soup.find('a', id = 'lnkPager_lnkNext')['href']
-    
+
+#using different user agents to avoid considering as a bot by the website
 def getheader():
     lines = open('user-agents.txt').read().splitlines()
     return random.choice(lines)
