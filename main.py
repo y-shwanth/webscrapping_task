@@ -18,14 +18,13 @@ def getsoup(url, headers):
 
 def getnextpage(common_url, soup):
     return common_url + soup.find('a', id = 'lnkPager_lnkNext')['href']
-
-#using different user agents to avoid considering as a bot by the website
+    
 def getheader():
     lines = open('user-agents.txt').read().splitlines()
     return random.choice(lines)
 
 #this function extracts the data and writes it under .csv file
-def func(url, headers):
+def func(url, headers, writer):
     soup = getsoup(url, headers)
     page_table = soup.find('table', class_ = 'table persist-area SearchResultsTable')
 
@@ -39,21 +38,21 @@ def func(url, headers):
 
             msp = row.find('td', class_ = 'column mfr-column hide-xsmall').getText()
             print(msp)
-
+            
             last = row.find('td', class_ = 'column text-center hide-xsmall')
             stockno = last.find('span', class_ = 'available-amount').getText()
-            print(stockno)
             
+            print(stockno)
             writer.writerow([remove(str(txt)), remove(str(msp)), remove(str(stockno))])
         except:
             time.sleep(0.5)
     return soup
             
 #this is the start function
-def main_func(url):
+def main_func(url, writer):
     while True:
         headers = {"User-agent": getheader()}
-        soup = func(url, headers)
+        soup = func(url, headers, writer)
         url = getnextpage(common_url, soup)
         if(url == common_url):
             break
@@ -67,4 +66,5 @@ for kw in kws:
     file = open(str(kw)+'.csv', 'w')
     writer = csv.writer(file)
     writer.writerow(['Manufacturer', 'Mouse part', 'Availability'])
-    main_func(url)
+    main_func(url, writer)
+    file.close()
